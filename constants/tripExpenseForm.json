@@ -1,0 +1,52 @@
+[
+    {
+        "id":1,
+        "label":"Expense Title",
+        "inputType":"text",
+        "name":"expensetitle",
+        "placeholder":"Maggie and Pepsi",
+        "required":true
+    },
+    {
+        "id":2,
+        "label":"Expense Description",
+        "inputType":"longtext",
+        "name":"expensedescription",
+        "placeholder":"We enjoyed an amazing breakfast together",
+        "required":false
+    },
+    
+    {
+        "id":4,
+        "label":"Total Expense",
+        "inputType":"currency",
+        "name":"totalexpense",
+        "placeholder":"200",
+        "required":true
+    },
+    {
+        "id":5,
+        "label":"Date",
+        "inputType":"date", 
+        "name":"date",
+        "placeholder":"nil",
+        "required":true
+    },
+    {
+        "id":6,
+        "label":"Payment Method",
+        "inputType":"paymentMethod", 
+        "name":"paymentmethod",
+        "placeholder":"nil",
+        "required":true
+    },
+    {
+        "id":7,
+        "label":"Split Pattern",
+        "inputType":"splitPattern", 
+        "name":"splitpattern",
+        "placeholder":"nil",
+        "required":true
+    }
+
+]

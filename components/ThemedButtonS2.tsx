@@ -18,7 +18,7 @@ export function ThemedButtonS2({
 }: ThemedButtonS2Props) {
     const color = useThemeColor({ light: lightTextColor, dark: darkTextColor }, "text")
     return (
-        <Pressable style={[styles.button]} onPress={() => {onClick() }} {...rest}>
+        <Pressable style={[styles.button,]} onPress={() => {onClick() }} {...rest}>
             <Text style={[styles.texts, {color:color}]}>{text}</Text>
         </Pressable>
     )

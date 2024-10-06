@@ -1,25 +1,25 @@
 import { Pressable, type PressableProps, StyleSheet, Text } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
-export type ThemedButtonS1Props = PressableProps & {
+export type ThemedButtonS3Props = PressableProps & {
     lightBackgroundColor?: string,
     darkBackgroundColor?: string,
     text?: string,
     onClick?: any,
 }
 
-export function ThemedButtonS1({
+export function ThemedButtonS3({
     style,
     lightBackgroundColor,
     darkBackgroundColor,
     text,
     onClick,
     ...rest
-}: ThemedButtonS1Props) {
+}: ThemedButtonS3Props) {
     const color = useThemeColor({ light: lightBackgroundColor, dark: darkBackgroundColor }, "background")
     return (
-        <Pressable style={[styles.button, {backgroundColor:color}]} onPress={onClick} {...rest}>
-            <Text style={styles.texts}>{text}</Text>
+        <Pressable style={[styles.button, {borderColor:color , borderWidth:1.5} ]} onPress={onClick} {...rest}>
+            <Text style={[styles.texts , {color:color}]}>{text}</Text>
         </Pressable>
     )
 }
@@ -40,6 +40,5 @@ const styles = StyleSheet.create({
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: '#fff',
     },
 })

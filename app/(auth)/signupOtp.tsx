@@ -5,9 +5,11 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedButtonS1 } from '@/components/ThemedButtonS1';
 import OTPInput from '@/components/OtpInput';
+import { useRouter } from 'expo-router';
 
 export default function signupOtp() {
     const [emailId, setEmailId] = useState<string>("");
+    const router = useRouter()
 
     return (
         <ThemedView style={styles.signupContainer} lightColor='#ff' darkColor='#212529'>
@@ -23,7 +25,7 @@ export default function signupOtp() {
                    
                     <OTPInput codeLength={5} onCodeFilled={()=>{}}/>
                     <Text style={[styles.resendText, {color:'#828282'}]}>Resend otp in 20s</Text>
-                    <ThemedButtonS1 lightBackgroundColor='#ef4f5f' text='Verify OTP' />
+                    <ThemedButtonS1 lightBackgroundColor='#ef4f5f' text='Verify OTP' onClick={()=> router.replace("/homepage")}/>
                     {/* <ThemedButtonS2 lightTextColor='#ef4f5f' text='I already have an account' /> */}
                 </ThemedView>
             </SafeAreaView>

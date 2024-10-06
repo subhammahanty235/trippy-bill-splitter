@@ -1,0 +1,68 @@
+[
+    {
+        "id":1,
+        "label":"Trip Name",
+        "inputType":"text",
+        "name":"tripname",
+        "placeholder":"Goa trip with boys",
+        "required":true
+    },
+    {
+        "id":2,
+        "label":"Trip Description",
+        "inputType":"longtext",
+        "name":"tripdescription",
+        "placeholder":"A short description of my trip",
+        "required":true
+    },
+    
+    {
+        "id":4,
+        "label":"Total Budget",
+        "inputType":"currency",
+        "name":"totalbudget",
+        "placeholder":"25000",
+        "required":false
+    },
+    {
+        "id":5,
+        "label":"Add Friends",
+        "inputType":"array", 
+        "name":"addfriends",
+        "placeholder":"nil",
+        "required":false
+    },
+    {
+        "id":6,
+        "label":"Start date",
+        "inputType":"date", 
+        "name":"startdate",
+        "placeholder":"nil",
+        "required":true
+    },
+    {
+        "id":7,
+        "label":"End date",
+        "inputType":"date", 
+        "name":"enddate",
+        "placeholder":"nil",
+        "required":true
+    },
+    {
+        "id":8,
+        "label":"End date",
+        "inputType":"date", 
+        "name":"enddate",
+        "placeholder":"nil",
+        "required":true
+    },
+    {
+        "id":9,
+        "label":"Add People",
+        "inputType":"addpeople", 
+        "name":"enddate",
+        "placeholder":"nil",
+        "required":true
+    }
+
+]

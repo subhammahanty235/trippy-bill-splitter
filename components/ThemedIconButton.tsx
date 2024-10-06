@@ -1,24 +1,28 @@
 import { Pressable, type PressableProps, StyleSheet, Text } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { FontAwesome5 } from "@expo/vector-icons";
 
-export type ThemedButtonS1Props = PressableProps & {
+export type ThemedIconButtonProps = PressableProps & {
     lightBackgroundColor?: string,
     darkBackgroundColor?: string,
     text?: string,
     onClick?: any,
+    icon?: any
 }
 
-export function ThemedButtonS1({
+export function ThemedIconButton({
     style,
     lightBackgroundColor,
     darkBackgroundColor,
     text,
     onClick,
+    icon,
     ...rest
-}: ThemedButtonS1Props) {
+}: ThemedIconButtonProps) {
     const color = useThemeColor({ light: lightBackgroundColor, dark: darkBackgroundColor }, "background")
     return (
-        <Pressable style={[styles.button, {backgroundColor:color}]} onPress={onClick} {...rest}>
+        <Pressable style={[styles.button, {backgroundColor:color} ]} onPress={onClick} {...rest}>
+            <FontAwesome5 name={icon} size={16} color={'#fff'}/>
             <Text style={styles.texts}>{text}</Text>
         </Pressable>
     )
@@ -26,17 +30,21 @@ export function ThemedButtonS1({
 
 const styles = StyleSheet.create({
     button: {
-        marginTop:20,
+        
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
+        paddingVertical: 6,
+        paddingHorizontal: 15,
         borderRadius: 10,
         elevation: 3,
-        height:50,
+        height:35,
+        display:'flex',
+        flexDirection:'row',
+        gap:10,
+
     },
     texts: {
-        fontSize: 18,
+        fontSize: 16,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
