@@ -10,14 +10,15 @@ export default function HomeLayout() {
   const getTheme = async()=>{
     await preloadTheme();
   }
+  
   useEffect(() => {
     getTheme()
   }, []);
   
   return (
 
-    <Tabs initialRouteName='homepage' screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name='homepage' options={{
+    <Tabs initialRouteName='(homepage)' screenOptions={{ headerShown: false }}>
+      <Tabs.Screen name='(homepage)' options={{
         title: 'Home',
         tabBarActiveTintColor: preferColorPalette.light.navIconColor,
         tabBarInactiveTintColor: 'gray',
