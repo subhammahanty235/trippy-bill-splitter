@@ -1,37 +1,73 @@
 import { StyleSheet, Text, TextInput, View, Image, Button, Pressable } from 'react-native';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedButtonS1 } from '@/components/ThemedButtonS1';
 import OTPInput from '@/components/OtpInput';
 import { useRouter } from 'expo-router';
-
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook/hooks';
+import { verifyLoginOtp, verifySignupOtp } from '@/redux/actions/authAction';
+import AccountCreatedAnimation from '@/assets/images/account-created-animated.json'
+import ConfimationPage from '@/components/ConfimationPage';
+import { useLocalSearchParams } from "expo-router";
 export default function signupOtp() {
-    const [emailId, setEmailId] = useState<string>("");
-    const router = useRouter()
+    const params = useLocalSearchParams();
+
+    const dispatch = useAppDispatch()
+    const { emailAndNameData, isOtpValidated, emailData } = useAppSelector((state) => state.auth)
+    const [showConfirmation, setShowConfirmation] = useState({flag:false, value:false});
+
+    const [otp, setOtp] = useState<string>("")
+    const router = useRouter();
+
+    const validateOtp = () => {
+        if (otp.length === 5) {
+            if(params.isLogin === "true"){
+                dispatch(verifyLoginOtp({emailId: emailData.emailId, otp: otp}))
+            }else{
+                dispatch(verifySignupOtp({ name: emailAndNameData.name, emailId: emailAndNameData.emailId, otp: otp }))
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (isOtpValidated === true) {
+            if(showConfirmation.flag === false){
+                setShowConfirmation({flag:true , value:true})
+                setTimeout(() => {
+                    // router.replace("/(home)/(homepage)/homepage");
+                    console.log("Calling hereee")
+                    setShowConfirmation({flag:true , value:false})
+                    router.push('/(home)/(homepage)/homepage')
+                }, 3000);
+            }
+        }
+    }, [isOtpValidated]);
 
     return (
         <ThemedView style={styles.signupContainer} lightColor='#ff' darkColor='#212529'>
             <View style={styles.halfCircle} />
             <SafeAreaView>
-               
-                    {/* <Ionicons name='chevron-back-outline' color={"#ef4f5f"} size={25}/> */}
-                    <ThemedText style={{ marginBottom: 10 }} type='subtitle' lightColor='#ef4f5f'>Enter the OTP</ThemedText>
-                
+                <ConfimationPage AnimationFile={AccountCreatedAnimation} visible={showConfirmation.value} />
+                <ThemedText style={{ marginBottom: 10 }} type='subtitle' lightColor='#ef4f5f'>Enter the OTP</ThemedText>
+
                 <ThemedText lightColor='#828282'>Simplify Your Travels: Create Your Account to Effortlessly Manage and Split Trip Expenses</ThemedText>
 
                 <ThemedView style={styles.signupContainerInner} lightColor='#ff'>
-                   
-                    <OTPInput codeLength={5} onCodeFilled={()=>{}}/>
-                    <Text style={[styles.resendText, {color:'#828282'}]}>Resend otp in 20s</Text>
-                    <ThemedButtonS1 lightBackgroundColor='#ef4f5f' text='Verify OTP' onClick={()=> router.replace("/homepage")}/>
+
+                    <OTPInput codeLength={5} onCodeFilled={(code) => setOtp(code)} />
+                    <Text style={[styles.resendText, { color: '#828282' }]}>Resend otp in 20s</Text>
+                    <ThemedButtonS1 lightBackgroundColor='#ef4f5f' text='Verify OTP' onClick={() => validateOtp()} />
                     {/* <ThemedButtonS2 lightTextColor='#ef4f5f' text='I already have an account' /> */}
                 </ThemedView>
             </SafeAreaView>
             <Image style={styles.logoImage} source={require("@/assets/images/logo-light.png")} />
             <View style={styles.halfCircleBottom} />
+
+
         </ThemedView>
+
     );
 };
 
@@ -57,16 +93,16 @@ const styles = StyleSheet.create({
         // backgroundColor:"black",
         height: 30,
     },
-    headerView:{
-        display:'flex',
-        flexDirection:'row',
-        
+    headerView: {
+        display: 'flex',
+        flexDirection: 'row',
+
     },
-    resendText:{
-        height:20,
-        textAlign:'right',
-        marginHorizontal:10,
-        fontSize:16
+    resendText: {
+        height: 20,
+        textAlign: 'right',
+        marginHorizontal: 10,
+        fontSize: 16
     },
     logoImage: {
         width: 150,

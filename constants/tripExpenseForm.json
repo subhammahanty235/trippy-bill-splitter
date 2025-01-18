@@ -29,7 +29,7 @@
         "label":"Date",
         "inputType":"date", 
         "name":"date",
-        "placeholder":"nil",
+        "placeholder":"Select the date",
         "required":true
     },
     {

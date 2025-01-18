@@ -2,7 +2,7 @@ import { Modal, StyleSheet, Text, View, Image, Pressable } from 'react-native'
 import React from 'react'
 import LottieView from 'lottie-react-native';
 import Anima from '@/assets/images/loading-animation.json'
-const LoadingPopup = () => {
+const LoadingPopup = ({AnimationFile, visible , setVisible}:any) => {
     return (
         <View style={styles.centeredView}>
             <Modal visible={false} transparent={true}>
@@ -12,13 +12,14 @@ const LoadingPopup = () => {
                     width: 100,
                     height: 100,
                     
-                }} source={Anima} autoPlay loop />
+                }} source={AnimationFile} autoPlay loop />
                 </View>
             </Modal>
             </View>
         
     )
 }
+
 
 export default LoadingPopup
 

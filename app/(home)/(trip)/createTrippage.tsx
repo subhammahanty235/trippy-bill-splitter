@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -9,27 +9,100 @@ import { ThemedIconButton } from '@/components/ThemedIconButton'
 import NewTripFromData from '@/constants/newTripFrom.json'
 import NewFormCompInputs from '@/components/NewFormCompInputs'
 import { ColorsEmereldGreen } from '@/constants/Colors'
-
+import { BottomSheetParentComponent } from '@/components/BottomSheetParentComponent'
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook/hooks'
+import { getAllConnections } from '@/redux/actions/conectionAction'
+import { createNewTrip } from '@/redux/actions/tripAction'
 const preferColorPalette = ColorsEmereldGreen;
 
 export default function newTrip() {
-  
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [selectedBottomSheet, setSelectedBottomSheet] = useState();
+  // const [formControllers, setFormControllers] = useState({});
+  const dispatch = useAppDispatch();
+  const handlePresentModalPress = useCallback((component: any) => {
+
+    setSelectedBottomSheet(component)
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  useEffect(() => {
+    dispatch(getAllConnections(1))
+  }, [dispatch])
+
+
+
+
   return (
 
     <ThemedView style={styles.homepageContainer} lightColor={preferColorPalette.light.background} darkColor='#212529'>
-      <View style={extraStyles.halfCircle} />
-      <SafeAreaView>
-        <NewTripPageHeading />
-        <NewTripForm />
-      </SafeAreaView>
+      <BottomSheetModalProvider>
+        <View style={extraStyles.halfCircle} />
+        <SafeAreaView>
+          <NewTripPageHeading />
+          <NewTripForm handlePresentModalPress={handlePresentModalPress} />
+          <BottomSheetParentComponent bottomSheetModalRef={bottomSheetModalRef} component={selectedBottomSheet} />
 
-
+        </SafeAreaView>
+        {/* <AddConnectionPopup visible={true} onClose={() => { }} /> */}
+      </BottomSheetModalProvider>
     </ThemedView>
 
   )
 }
 
-function NewTripForm() {
+function NewTripForm({ handlePresentModalPress }: any) {
+  interface Controller {
+    value: string | any;
+    error: string | null;
+  }
+  type FormControllers = Record<string, Controller>;
+
+  const [formControllers, setFormControllers] = useState<FormControllers>({});
+  const dispatch = useAppDispatch();
+
+  const handleChange = (fieldname: string, text: string) => {
+    const value = text
+    console.log(value)
+
+    // Update the state
+    setFormControllers((prevControllers) => ({
+      ...prevControllers,
+      [fieldname]: {
+        ...prevControllers[fieldname],
+        value: value,
+        error: null,
+      },
+    }));
+  };
+
+  const { loading, listedConnections } = useAppSelector((state) => state.trip);
+  const handleSubmitForm = () => {
+    if (listedConnections.length > 0) {
+      console.log(listedConnections);
+
+      const listedConnectionIds = listedConnections.map((connection) => ({
+        isPlcUser: connection.isPlcUser,
+        id: connection.isPlcUser
+          ? connection?.preLoggedConnectedUser?.id
+          : connection?.connectedUser?.id,
+      }));
+      const updatedFormControllers = {
+        ...formControllers,
+        addedpeople: {
+          ...formControllers["addedpeople"],
+          value: listedConnectionIds,
+          error: null,
+        },
+      };
+
+      dispatch(createNewTrip(updatedFormControllers));
+    } else {
+      dispatch(createNewTrip(formControllers));
+    }
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}>
@@ -39,19 +112,14 @@ function NewTripForm() {
             if (data.id !== 5) {
               return <View style={styles.newTripFormView}>
                 <Text style={styles.newTripFormViewText}>{data.label}</Text>
-                <NewFormCompInputs data={data} />
+                <NewFormCompInputs data={data} handlePresentModalPress={handlePresentModalPress} handleChange={handleChange} formControllers={formControllers} setFormControllers={setFormControllers} />
               </View>
             }
           })
         }
-        {/* <ThemedButtonS1/> */}
       </View>
-
-      <ThemedButtonS1 lightBackgroundColor={preferColorPalette.light.tabIconSelected} text='Create'/>
-
+      <ThemedButtonS1 lightBackgroundColor={preferColorPalette.light.tabIconSelected} text='Create' onClick={handleSubmitForm} />
     </ScrollView>
-
-
   )
 }
 
@@ -68,7 +136,7 @@ function NewTripPageHeading() {
       <View style={headerStyles.headerCompLine} />
       <Text style={{ color: 'grey' }}>or</Text>
       <View style={headerStyles.headerCompLineSec} />
-      <ThemedIconButton lightBackgroundColor={preferColorPalette.light.primary} text='Join' icon={'suitcase-rolling'} onClick={navigateToJoinTrip}/>
+      <ThemedIconButton lightBackgroundColor={preferColorPalette.light.primary} text='Join' icon={'suitcase-rolling'} onClick={navigateToJoinTrip} />
     </View>
   )
 }
@@ -84,7 +152,8 @@ const styles = StyleSheet.create({
   newTripForm: {
     display: 'flex',
     gap: 20,
-    marginTop: 20
+    marginTop: 20,
+    marginBottom: 20
   },
   newTripFormView: {
 

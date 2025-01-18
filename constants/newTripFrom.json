@@ -37,7 +37,7 @@
         "label":"Start date",
         "inputType":"date", 
         "name":"startdate",
-        "placeholder":"nil",
+        "placeholder":"Select the Begin Date",
         "required":true
     },
     {
@@ -45,16 +45,8 @@
         "label":"End date",
         "inputType":"date", 
         "name":"enddate",
-        "placeholder":"nil",
-        "required":true
-    },
-    {
-        "id":8,
-        "label":"End date",
-        "inputType":"date", 
-        "name":"enddate",
-        "placeholder":"nil",
-        "required":true
+        "placeholder":"Select the End Date",
+        "required":false
     },
     {
         "id":9,

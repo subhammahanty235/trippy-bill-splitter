@@ -31,6 +31,7 @@ export function ThemedInputS1({
             value={value}
             onChange={onChange}
             placeholder={placeHolderText}
+            autoCapitalize="none" 
             {...rest}
         />
     )

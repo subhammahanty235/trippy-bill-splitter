@@ -10,19 +10,20 @@ export default function HomeLayout() {
   const getTheme = async()=>{
     await preloadTheme();
   }
-  
+
   useEffect(() => {
     getTheme()
   }, []);
   
   return (
 
-    <Tabs initialRouteName='(homepage)' screenOptions={{ headerShown: false }}>
+    <Tabs initialRouteName='(auth)' screenOptions={{ headerShown: false }}>
       <Tabs.Screen name='(homepage)' options={{
         title: 'Home',
         tabBarActiveTintColor: preferColorPalette.light.navIconColor,
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: styles.tabBars,
+        tabBarHideOnKeyboard:true,
         tabBarIcon: ({ focused, color, size }) => (
           <View style={[styles.iconContainer, focused && styles.focusedTab]}>
             <FontAwesome name={focused ? 'home' : 'home'} size={size} color={color} />
@@ -38,6 +39,7 @@ export default function HomeLayout() {
         tabBarActiveTintColor: preferColorPalette.light.navIconColor,
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: styles.tabBars,
+        tabBarHideOnKeyboard:true,
         tabBarIcon: ({ focused, color, size }) => (
           <View style={[styles.iconContainer, focused && styles.focusedTab]}>
             <FontAwesome name={focused ? 'plus-square' : 'plus-square'} size={size} color={color} />
@@ -53,6 +55,7 @@ export default function HomeLayout() {
         tabBarActiveTintColor: preferColorPalette.light.navIconColor,
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: styles.tabBars,
+        tabBarHideOnKeyboard:true,
         tabBarIcon: ({ focused, color, size }) => (
           <View style={[styles.iconContainer, focused && styles.focusedTab]}>
             <FontAwesome name={focused ? 'user' : 'user'} size={size} color={color} />

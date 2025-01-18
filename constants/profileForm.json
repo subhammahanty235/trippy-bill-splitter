@@ -1,0 +1,28 @@
+[
+    {
+        "id":1,
+        "label":"Full Name",
+        "inputType":"text",
+        "name":"name",
+        "placeholder":"Ram Pyari",
+        "required":true
+    },
+    {
+        "id":2,
+        "label":"Email Id",
+        "inputType":"text",
+        "name":"emailId",
+        "placeholder":"",
+        "required":true
+    },
+    
+    {
+        "id":3,
+        "label":"Short Bio",
+        "inputType":"longtext",
+        "name":"bio",
+        "placeholder":"Rampyari ke pyari kahani",
+        "required":false
+    }
+
+]

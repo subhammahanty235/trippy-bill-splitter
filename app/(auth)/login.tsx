@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextInput, View, Image, Button, Pressable } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -7,16 +7,40 @@ import { ThemedInputS1 } from '@/components/ThemedInputS1';
 import { ThemedButtonS1 } from '@/components/ThemedButtonS1';
 import { ThemedButtonS2 } from '@/components/ThemedButtonS2';
 import { useRouter } from 'expo-router';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook/hooks';
+import { sendloginOtp, setEmailDataForLogin } from '@/redux/actions/authAction';
 
 export default function login() {
     const [emailId, setEmailId] = useState<string>("");
     const router = useRouter()
+    const dispatch = useAppDispatch()
+    const { isOtpSent, loading } = useAppSelector((state) => state.auth)
 
-    const goToOtpScreen = () =>{
+    const goToOtpScreen = () => {
         //otp request logic
 
-        router.push("/signupOtp")
+        console.log(emailId)
+        const userDetails = {
+            emailId: emailId
+        };
+        dispatch(sendloginOtp(userDetails))
+        // router.push("/signupOtp")
     }
+
+    useEffect(() => {
+        if (isOtpSent === true) {
+            let obj = {
+                emailId: emailId
+            }
+            console.log("Object is ---- >")
+            console.log(obj)
+            dispatch(setEmailDataForLogin(obj))
+            router.push({
+                pathname: "/signupOtp",
+                params: { isLogin: "true"},
+            })
+        }
+    }, [dispatch, isOtpSent, loading])
 
     return (
         <ThemedView style={styles.signupContainer} lightColor='#ff' darkColor='#212529'>
@@ -26,10 +50,10 @@ export default function login() {
                 <ThemedText lightColor='#828282'>Simplify Your Travels: Create Your Account to Effortlessly Manage and Split Trip Expenses.</ThemedText>
 
                 <ThemedView style={styles.signupContainerInner} lightColor='#ff'>
-                    <ThemedInputS1 placeHolderText='Enter EmailId' value={emailId} onChange={(e: any) => { setEmailId(e.target.value) }} lightBorderColor='#f9d7da' activeColor='#ef4f5f' />
+                    <ThemedInputS1 placeHolderText='Enter EmailId' value={emailId} onChangeText={(e: any) => {  setEmailId(e)}} lightBorderColor='#f9d7da' activeColor='#ef4f5f' />
                     {/* <ThemedText style={styles.linkText} type='link' lightColor='#ef4f5f'>Already Have an Account?</ThemedText> */}
-                    <ThemedButtonS1 lightBackgroundColor='#ef4f5f' text='Get OTP' onClick={goToOtpScreen}/>
-                    <ThemedButtonS2 lightTextColor='#ef4f5f' text='Create a new account' onClick={()=> router.replace("/signup")}/>
+                    <ThemedButtonS1 lightBackgroundColor='#ef4f5f' text='Get OTP' onClick={goToOtpScreen} />
+                    <ThemedButtonS2 lightTextColor='#ef4f5f' text='Create a new account' onClick={() => router.replace("/signup")} />
                 </ThemedView>
             </SafeAreaView>
             <Image style={styles.logoImage} source={require("@/assets/images/logo-light.png")} />
@@ -55,10 +79,10 @@ const styles = StyleSheet.create({
         display: 'flex',
         gap: 20
     },
-    linkText:{
-        color:'black',
+    linkText: {
+        color: 'black',
         // backgroundColor:"black",
-        height:30,
+        height: 30,
     },
     logoImage: {
         width: 150,

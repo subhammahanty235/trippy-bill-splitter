@@ -1,5 +1,5 @@
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View, Image } from 'react-native'
-import React, { Ref, useCallback, useMemo, useRef, useState } from 'react'
+import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'expo-router'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedIconButton } from '@/components/ThemedIconButton'
@@ -10,27 +10,49 @@ import TripExpenseFormData from '@/constants/tripExpenseForm.json'
 import NewFormCompInputs from '@/components/NewFormCompInputs'
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet'
 import LoadingPopup from '@/components/LoadingPopup'
-import LottieView from 'lottie-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook/hooks'
+import { addNewTripExpense } from '@/redux/actions/expenseAction'
 const preferColorPalette = ColorsEmereldGreen;
 
 const listExpense = () => {
+  interface Controller {
+    value: string | any;
+    error: string | null;
+  }
+  type FormControllers = Record<string, Controller>;
+
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const [selectedBottomSheet, setSelectedBottomSheet] = useState();
+  const [selectedBottomSheet, setSelectedBottomSheet] = useState(null);
+  const [formControllers, setFormControllers] = useState<FormControllers>({});
+
 
   const handlePresentModalPress = useCallback((component: any) => {
-
     setSelectedBottomSheet(component)
     bottomSheetModalRef.current?.present();
   }, []);
+
+  const handleRemoveModalPress = useCallback(() => {
+    setSelectedBottomSheet(null)
+    bottomSheetModalRef.current?.close();
+  }, []);
+
+  const dispatch = useAppDispatch();
+  const {completeTripDetails} = useAppSelector((state) => state.trip)
+
+  const saveExpenseHandler = () => {
+    dispatch(addNewTripExpense({data:formControllers, tripId:completeTripDetails.id}));
+  }
 
   return (
     <ThemedView style={styles.listExpenseContainer} lightColor={preferColorPalette.light.background} darkColor='#212529'>
       <BottomSheetModalProvider>
         <SafeAreaView>
-          <ListExpensePageHeading />
+          <ListExpensePageHeading saveExpenseHandler={saveExpenseHandler}/>
 
           <LoadingPopup />
-          <ExpenseForm handlePresentModalPress={handlePresentModalPress} />
+          <ExpenseForm handlePresentModalPress={handlePresentModalPress} formControllers={formControllers} setFormControllers={setFormControllers} handleRemoveModalPress={handleRemoveModalPress} />
 
         </SafeAreaView>
         <BottomSheetParentComponent bottomSheetModalRef={bottomSheetModalRef} component={selectedBottomSheet} />
@@ -40,15 +62,46 @@ const listExpense = () => {
   )
 }
 
-const ExpenseForm = ({ handlePresentModalPress }: any) => {
+const ExpenseForm = ({ handlePresentModalPress, formControllers, setFormControllers, handleRemoveModalPress }: any) => {
+
+  const handleChange = (fieldname: string, text: string) => {
+    const value = text
+    // Update the state
+    setFormControllers((prevControllers: any) => ({
+      ...prevControllers,
+      [fieldname]: {
+        ...prevControllers[fieldname],
+        value: value,
+        error: null,
+      },
+    }));
+  };
+
+  //TODO: move it to right place
+  useEffect(()=>{
+    //set dropdown values
+    setFormControllers((prevControllers: any) => ({
+      ...prevControllers,
+      ['splitPattern']: {
+        ...prevControllers['splitPattern'],
+        value: 'equal',
+        error: null,
+      },
+    }));
+  },[])
+
+
 
   const SelectedPaymentMethodComp = () => {
     return (
-      <Pressable onPress={() => { handlePresentModalPress(<PaymentOptions />) }}>
+      <Pressable onPress={() => { handlePresentModalPress(<PaymentOptions formControllers={formControllers} setFormControllers={setFormControllers} handleRemoveModalPress={handleRemoveModalPress} />) }}>
         <View style={ExpanseFormStyles.selectedPaymentMethodComp}>
           <View style={ExpanseFormStyles.selectedPaymentMethodCompAddButton}>
-            <FontAwesome5 name="plus" size={17} color={preferColorPalette.light.tint} />
-            <Text style={{ fontSize: 16, fontWeight: '500', color: preferColorPalette.light.textPrimary }}>Add Payment Method</Text>
+            {
+              formControllers['paymentMethod']?.value ? <Image style={{ width: 40, height: 40, borderRadius: 10, }} source={{ uri: formControllers['paymentMethod']?.value.image }} />
+                : <FontAwesome5 name="plus" size={17} color={preferColorPalette.light.tint} />
+            }
+            <Text style={{ fontSize: 16, fontWeight: '500', color: preferColorPalette.light.textPrimary }}>{formControllers['paymentMethod']?.value.text || "Add Payment Method"}</Text>
           </View>
         </View>
       </Pressable>
@@ -65,7 +118,7 @@ const ExpenseForm = ({ handlePresentModalPress }: any) => {
             if (data.id !== 5 && data.id !== 6 && data.id !== 7) {
               return <View key={data.id} style={ExpanseFormStyles.newExpenseFormView}>
                 <Text style={ExpanseFormStyles.newExpenseFormViewText}>{data.label}</Text>
-                <NewFormCompInputs data={data} handlePresentModalPress={handlePresentModalPress} />
+                <NewFormCompInputs data={data} handlePresentModalPress={handlePresentModalPress} handleChange={handleChange} formControllers={formControllers} setFormControllers={setFormControllers} />
               </View>
             }
             else if (data.id === 7) {
@@ -74,22 +127,20 @@ const ExpenseForm = ({ handlePresentModalPress }: any) => {
                 <SelectedPaymentMethodComp />
               </View>
             }
-
             else if (data.id === 6) {
               return <View key={data.id} style={ExpanseFormStyles.newExpenseFormView}>
                 <Text style={ExpanseFormStyles.newExpenseFormViewText}>{data.label}</Text>
-                <SelectSplitPatterComponet handlePresentModalPress={handlePresentModalPress} />
+                <SelectSplitPatterComponet handlePresentModalPress={handlePresentModalPress} formControllers={formControllers} setFormControllers={setFormControllers} handleRemoveModalPress={handleRemoveModalPress}/>
               </View>
             }
           })
         }
         <View style={ExpanseFormStyles.newExpenseFormView}>
           <Text style={ExpanseFormStyles.newExpenseFormViewText}>Select members</Text>
-          <ExpenseFormMembersComp />
+          <ExpenseFormMembersComp formControllers={formControllers} setFormControllers={setFormControllers} />
         </View>
 
-        {/* <ThemedIconButton lightBackgroundColor={preferColorPalette.light.primary} text='open bottomsheet' icon={'plus-circle'} onClick={handlePresentModalPress} /> */}
-        {/* <ThemedButtonS1/> */}
+
       </View>
 
     </ScrollView>
@@ -97,12 +148,24 @@ const ExpenseForm = ({ handlePresentModalPress }: any) => {
 }
 
 
-const SelectSplitPatterComponet = ({ handlePresentModalPress }: any) => {
+const SelectSplitPatterComponet = ({ handlePresentModalPress, formControllers, setFormControllers , handleRemoveModalPress}: any) => {
+  const splitPatterns = [
+    {
+      title: "Equally Split",
+      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, numquam!",
+      key: 'equal',
+    },
+    {
+      title: "Custom Split",
+      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, numquam!",
+      key: 'custom',
+    }
+  ]
 
   return (
-    <Pressable onPress={() => handlePresentModalPress(<SplitScreenOptions />)}>
+    <Pressable onPress={() => handlePresentModalPress(<SplitScreenOptions formControllers={formControllers} setFormControllers={setFormControllers} handleRemoveModalPress={handleRemoveModalPress} />)}>
       <View style={selectSplitPatterComponetStyle.selectSplitPatterComponet}>
-        <Text style={{ fontSize: 18, fontWeight: '500', color: preferColorPalette.light.textPrimary }}>Equally Split</Text>
+        <Text style={{ fontSize: 18, fontWeight: '500', color: preferColorPalette.light.textPrimary }}>{splitPatterns.find((pattern)=>pattern.key === formControllers['splitPattern']?.value)?.title}</Text>
         <FontAwesome5 name="angle-down" color={preferColorPalette.light.textSecondary} size={25} />
       </View>
     </Pressable>
@@ -110,24 +173,58 @@ const SelectSplitPatterComponet = ({ handlePresentModalPress }: any) => {
 
 }
 
-const SplitScreenOptions = () => {
+const SplitScreenOptions = ({ formControllers, setFormControllers, handleRemoveModalPress }: any) => {
+  const splitPatterns = [
+    {
+      title: "Equally Split",
+      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, numquam!",
+      key: 'equal',
+    },
+    {
+      title: "Custom Split",
+      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, numquam!",
+      key: 'custom',
+    }
+  ]
+
+  const setSelectedOption = (val:string) => {
+    setFormControllers((prevControllers: any) => ({
+      ...prevControllers,
+      ['splitPattern']: {
+        ...prevControllers['splitPattern'],
+        value: val,
+        error: null,
+      },
+    }));
+
+    handleRemoveModalPress()
+
+  }
+
+  // useEffect(()=>{
+  //   if(!formControllers['splitPattern']?.value){
+  //     setSelectedOption(splitPatterns[0].key);
+  //     console.log("setting ----------------------")
+  //   }
+  // },[formControllers])
 
   return (
     <View style={{ display: 'flex', gap: 15 }}>
-      <View style={selectSplitPatterComponetStyle.selectSplitPatterComponetMain}>
-        <View style={[selectSplitPatterComponetStyle.splitScreenOption]}>
-          <Text style={selectSplitPatterComponetStyle.optionPrimaryText}>Equally Split</Text>
-          <Text style={{ color: preferColorPalette.light.textSecondary }}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, numquam!</Text>
-        </View>
-        <View style={selectSplitPatterComponetStyle.selected} />
-      </View>
-      <View style={selectSplitPatterComponetStyle.selectSplitPatterComponetMain}>
-        <View style={[selectSplitPatterComponetStyle.splitScreenOption]}>
-          <Text style={selectSplitPatterComponetStyle.optionPrimaryText}>Equally Split</Text>
-          <Text style={{ color: preferColorPalette.light.textSecondary }}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, numquam!</Text>
-        </View>
-        <View style={selectSplitPatterComponetStyle.notSelected} />
-      </View>
+      {
+        splitPatterns?.map((pattern): any => {
+          return <Pressable style={selectSplitPatterComponetStyle.selectSplitPatterComponetMain} onPress={()=>setSelectedOption(pattern.key)}>
+            <View style={[selectSplitPatterComponetStyle.splitScreenOption]}>
+              <Text style={selectSplitPatterComponetStyle.optionPrimaryText}>{pattern.title}</Text>
+              <Text style={{ color: preferColorPalette.light.textSecondary }}>{pattern.description}</Text>
+            </View>
+            {
+              formControllers['splitPattern']?.value === pattern.key ?<View style={selectSplitPatterComponetStyle.selected} /> :<FontAwesome5 size={30} name="circle" color="grey" />
+            }
+            
+          </Pressable>
+        })
+      }
+      
     </View>
   )
 }
@@ -150,7 +247,7 @@ const selectSplitPatterComponetStyle = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // backgroundColor: '#ff',
+    backgroundColor: '#fff',
     padding: 10,
     shadowColor: '#000', // Shadow color
     shadowOffset: { width: 0, height: 2 }, // Shadow offset
@@ -162,7 +259,7 @@ const selectSplitPatterComponetStyle = StyleSheet.create({
     borderRadius: 7
   },
   splitScreenOption: {
-    //nothing now  
+
   },
   selected: {
     height: 30,
@@ -185,12 +282,24 @@ const selectSplitPatterComponetStyle = StyleSheet.create({
   }
 })
 
-const PaymentOptions = () => {
-
+const PaymentOptions = ({ formControllers, setFormControllers, handleRemoveModalPress }: any) => {
   //child component to render the payment methods
+
   const PaymentOptionChip = ({ data }: any) => {
+
+    const selectPaymentMethod = () => {
+      setFormControllers((prevControllers: any) => ({
+        ...prevControllers,
+        ['paymentMethod']: {
+          ...prevControllers['paymentMethod'],
+          value: data,
+          error: null,
+        },
+      }));
+      handleRemoveModalPress()
+    }
     return (
-      <View style={[ExpanseFormStyles.memberChip, { padding: 10, justifyContent: 'space-between' }]}>
+      <Pressable style={[ExpanseFormStyles.memberChip, { padding: 10, justifyContent: 'space-between' }]} onPress={selectPaymentMethod}>
         <View style={ExpanseFormStyles.memberChip}>
           <Image style={{ width: 40, height: 40, borderRadius: 10, }} source={{ uri: data.image }} />
           <View>
@@ -201,9 +310,17 @@ const PaymentOptions = () => {
         </View>
 
         <View>
-          <FontAwesome5 size={25} name="circle" color="grey" />
+          {
+            formControllers['paymentMethod']?.value?.text === data.text ?
+              <FontAwesome5 size={25} name="circle" color={preferColorPalette.light.primary} /> :
+              <Pressable onPress={() => console.log(formControllers)}>
+                <FontAwesome5 size={25} name="circle" color="grey" />
+
+              </Pressable>
+          }
+
         </View>
-      </View>
+      </Pressable>
     )
   }
 
@@ -250,35 +367,109 @@ const BottomSheetParentComponent = ({ bottomSheetModalRef, component }: any) => 
   )
 }
 
-const ExpenseFormMembersComp = () => {
 
-  const MemberChip = () => {
+const ExpenseFormMembersComp = ({ formControllers, setFormControllers }: any) => {
+  interface MemberAndAmount {
+    userId: number;
+    amount: number;
+  }
+
+  const { liveTripOfUser, loadingFetchliveTrip } = useAppSelector((state) => state.trip);
+  const tripMembers = liveTripOfUser?.tripUsers;
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [membersAndAmt, setMembersAndAmt] = useState<MemberAndAmount[]>([]);
+
+  const amount = formControllers['budget']?.value;
+
+  const selectUser = (userId: number) => {
+    console.log("Adding user")
+    setSelectedMembers((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+    calculateAmount()
+  };
+
+  const calculateAmount = useCallback(() => {
+    console.log("Calculating the value")
+    let sp = "Equal"
+    if (sp === 'Equal' && selectedMembers.length > 0) {
+      const dividedAmount = amount / selectedMembers.length;
+      console.log(dividedAmount)
+      console.log(amount)
+      console.log(selectedMembers)
+      const dataset: MemberAndAmount[] = selectedMembers.map((member) => ({
+        userId: member,
+        amount: parseFloat(dividedAmount.toFixed(2)), // Format to 2 decimal places
+      }));
+      setMembersAndAmt(dataset);
+
+      setFormControllers((prevControllers: any) => ({
+        ...prevControllers,
+        ['addedMembers']: {
+          ...prevControllers['addedMembers'],
+          value: dataset,
+          error: null,
+        },
+      }));
+
+    } else {
+      setMembersAndAmt([]); // Clear if no members are selected
+    }
+  }, [amount, selectedMembers]);
+
+  useEffect(() => {
+    calculateAmount();
+  }, [calculateAmount, selectedMembers]);
+
+
+
+  const MemberChip = ({ member }: any) => {
+    let foundMember = membersAndAmt.find((item) => item.userId === member?.userId);
+
+    useEffect(() => {
+      foundMember = membersAndAmt.find((item) => item.userId === member?.userId);
+    }, [foundMember, membersAndAmt])
     return (
-      <View style={[ExpanseFormStyles.memberChip, { padding: 10, justifyContent: 'space-between' }]}>
+      <Pressable
+        style={[ExpanseFormStyles.memberChip, { padding: 10, justifyContent: 'space-between' }]}
+        onPress={() => selectUser(member.userId)}
+      >
         <View style={ExpanseFormStyles.memberChip}>
-          <Image style={{ width: 40, height: 40, borderRadius: 10, }} source={{ uri: "https://scontent.fpat2-3.fna.fbcdn.net/v/t39.30808-6/449852965_1918058475312331_1887972380337288764_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=conRr-EdwXUQ7kNvgFV0ly4&_nc_ht=scontent.fpat2-3.fna&oh=00_AYClf5Hl_azBEG5im8Ohyt-Fne2CqAKd55hq58slgY9zHQ&oe=66FCAD95" }} />
+          <Image
+            style={{ width: 40, height: 40, borderRadius: 10 }}
+            source={{
+              uri: "https://scontent.fpat2-3.fna.fbcdn.net/v/t39.30808-6/449852965_1918058475312331_1887972380337288764_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=conRr-EdwXUQ7kNvgFV0ly4&_nc_ht=scontent.fpat2-3.fna&oh=00_AYClf5Hl_azBEG5im8Ohyt-Fne2CqAKd55hq58slgY9zHQ&oe=66FCAD95",
+            }}
+          />
           <View>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: preferColorPalette.light.textPrimary }}>Subham</Text>
-            <Text style={{ color: preferColorPalette.light.tint, fontWeight: '700' }}>$20</Text>
-
+            <Text style={{ fontSize: 16, fontWeight: '600', color: preferColorPalette.light.textPrimary }}>
+              {member?.people?.name}
+            </Text>
+            <Text style={{ color: preferColorPalette.light.tint, fontWeight: '700' }}>
+              {foundMember ? `$${foundMember.amount}` : "Add me"}
+            </Text>
           </View>
         </View>
 
         <View>
-          <FontAwesome5 size={25} name="circle" color="grey" />
+          {
+            foundMember ? <FontAwesome5 size={25} name="circle" color={preferColorPalette.light.primary} /> : <FontAwesome5 size={25} name="circle" color="grey" />
+          }
+
         </View>
-      </View>
-    )
-  }
+      </Pressable>
+    );
+  };
 
   return (
     <View style={ExpanseFormStyles.expenseFormMembersComp}>
-      <MemberChip />
-      <MemberChip />
-      <MemberChip />
+      {tripMembers?.map((member: any) => (
+        <MemberChip key={member.userId} member={member} />
+      ))}
     </View>
-  )
-}
+  );
+};
+
 
 const ExpanseFormStyles = StyleSheet.create({
   newExpenseForm: {
@@ -316,7 +507,7 @@ const ExpanseFormStyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: 10,
-    width: '65%',
+    // width: '65%',
     borderRadius: 20
 
   }
@@ -324,12 +515,9 @@ const ExpanseFormStyles = StyleSheet.create({
 
 })
 
-function ListExpensePageHeading() {
+function ListExpensePageHeading({saveExpenseHandler}:any) {
   const router = useRouter()
-
-  const navigateToJoinTrip = () => {
-    router.push("/createTrippage")
-  }
+  
 
   return (
     <View style={headerStyles.headerComp}>
@@ -340,7 +528,7 @@ function ListExpensePageHeading() {
         <ThemedText type='subtitle' lightColor={preferColorPalette.light.primary} >List Expense</ThemedText>
       </View>
 
-      <ThemedIconButton lightBackgroundColor={preferColorPalette.light.primary} text='Save' icon={'plus-circle'} onClick={navigateToJoinTrip} />
+      <ThemedIconButton lightBackgroundColor={preferColorPalette.light.primary} text='Save' icon={'plus-circle'} onClick={saveExpenseHandler} />
     </View>
   )
 }
@@ -352,7 +540,6 @@ const headerStyles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor:'black',
     justifyContent: 'space-between',
     gap: 10
   },
@@ -374,7 +561,7 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingLeft: 30,
     paddingRight: 30,
-    marginTop: 15
+
   }
 })
 

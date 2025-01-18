@@ -1,24 +1,19 @@
-import { SafeAreaView, StyleSheet, Text, View, Image, Pressable } from 'react-native'
+import { StyleSheet, Text, View, Image, Pressable, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons'
-import { ScrollView } from 'react-native-gesture-handler'
+// import { ScrollView } from 'react-native-gesture-handler'
 import { useRouter } from 'expo-router'
-// import CreditCardIcon from '@/assets/images/Credit-Card-Application.svg'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
 import { ColorsRoseRed, getSelectedTheme, preloadTheme, selectedTheme } from '@/constants/Colors'
 
 let preferColorPalette = getSelectedTheme();
 
 const paymentOptionsPage = () => {
   useEffect(()=>{
-    
-    console.log("First one ------------------__>")
-    console.log(preferColorPalette)
     preloadTheme()
-    preferColorPalette = getSelectedTheme()
-    console.log("Second One --------------> ")
-    console.log(preferColorPalette)
   })
   const [extendChip, setExtendChip] = useState<string>("") //to be updated: demo code
   return (

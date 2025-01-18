@@ -1,4 +1,4 @@
-import { Link, Stack } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -32,12 +32,14 @@ import { ThemedView } from '@/components/ThemedView';
 // });
 import { useRoute } from '@react-navigation/native';
 import { Button, Text, View } from 'react-native';
+import { useEffect } from 'react';
 
 export default function NotFoundScreen() {
   const route = useRoute();
 
   console.log('Current route name:', route.name);
   console.log('Current route params:', route.params);
+
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

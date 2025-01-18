@@ -26,7 +26,7 @@ export function ThemedButtonS1({
 
 const styles = StyleSheet.create({
     button: {
-        marginTop:20,
+        // marginTop:20,
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 12,

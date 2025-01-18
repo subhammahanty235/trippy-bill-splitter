@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextInput, View, Image, Button, Pressable } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -7,16 +7,42 @@ import { ThemedInputS1 } from '@/components/ThemedInputS1';
 import { ThemedButtonS1 } from '@/components/ThemedButtonS1';
 import { ThemedButtonS2 } from '@/components/ThemedButtonS2';
 import { useRouter } from 'expo-router';
+import { sendSignupOtp, setNameandEmailDataForSignup } from '@/redux/actions/authAction';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook/hooks';
 
 export default function signup() {
     const [emailId, setEmailId] = useState<string>("");
+    const [name, setName] = useState<string>("")
     const router = useRouter()
-
+    const dispatch = useAppDispatch()
+    const {isOtpSent, loading} = useAppSelector((state)=>state.auth)
     const goToOtpScreen = () =>{
         //otp request logic
-
-        router.push("/signupOtp")
+        console.log(name)
+        console.log(emailId)
+        const userDetails = {
+            name: name,
+            emailId: emailId
+        };
+        dispatch(sendSignupOtp(userDetails))
+        // router.push("/signupOtp")
     }
+
+    useEffect(()=>{
+        if(isOtpSent === true){
+            let obj = {
+                name:name ,
+                emailId:emailId 
+            }
+            console.log("Object is ---- >")
+            console.log(obj)
+            dispatch(setNameandEmailDataForSignup(obj))
+            router.push({
+                pathname: "/signupOtp",
+                params: { isLogin: "false"},
+            })
+        }
+    },[dispatch , isOtpSent, loading])
 
     return (
         <ThemedView style={styles.signupContainer} lightColor='#ff' darkColor='#212529'>
@@ -26,8 +52,8 @@ export default function signup() {
                 <ThemedText lightColor='#828282'>Simplify Your Travels: Create Your Account to Effortlessly Manage and Split Trip Expenses</ThemedText>
 
                 <ThemedView style={styles.signupContainerInner} lightColor='#ff'>
-                    <ThemedInputS1 placeHolderText='Enter Name' value={emailId} onChange={(e: any) => { setEmailId(e.target.value) }} lightBorderColor='#f9d7da' activeColor='#ef4f5f' />
-                    <ThemedInputS1 placeHolderText='Enter EmailId' value={emailId} onChange={(e: any) => { setEmailId(e.target.value) }} lightBorderColor='#f9d7da' activeColor='#ef4f5f' />
+                    <ThemedInputS1 placeHolderText='Enter Name' value={name} onChangeText={(e: any) => { setName(e) }} lightBorderColor='#f9d7da' activeColor='#ef4f5f' />
+                    <ThemedInputS1 placeHolderText='Enter EmailId' value={emailId} onChangeText={(e: any) => {  setEmailId(e)}} lightBorderColor='#f9d7da' activeColor='#ef4f5f' />
                     {/* <ThemedText style={styles.linkText} type='link' lightColor='#ef4f5f'>Already Have an Account?</ThemedText> */}
                     <ThemedButtonS1 lightBackgroundColor='#ef4f5f' text='Next' onClick={goToOtpScreen}/>
                     <ThemedButtonS2 lightTextColor='#ef4f5f' text='I already have an account' onClick={()=> router.replace("/login")}/>

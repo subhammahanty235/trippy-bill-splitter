@@ -5,8 +5,8 @@ import getSymbolFromCurrency from 'currency-symbol-map'
 import { ColorsEmereldGreen } from '@/constants/Colors';
 const preferColorPalette = ColorsEmereldGreen;
 
-const CurrencyDropdown = () => {
-    const [selectedCountry, setSelectedCountry] = useState<any>("IN")
+const CurrencyDropdown = ({ setFormControllers }: any) => {
+    const [selectedCountry, setSelectedCountry] = useState<string>("IN")
     const [inputFilter, setInputFilter] = useState<string>("")
     const countryList = Country.getAllCountries().map((item) => ({
         countryFlag: item.flag,
@@ -15,27 +15,37 @@ const CurrencyDropdown = () => {
         currencyCode: item.currency,
     }));
 
-
+    const selectCountry = (country: string) => {
+        setFormControllers((prevControllers: any) => ({
+            ...prevControllers,
+            "defaultCurrency": {
+                ...prevControllers["defaultCurrency"],
+                value: country,
+                error: null,
+            },
+        }));
+        setSelectedCountry(country)
+    }
 
 
     return (
         <View style={currencyDropdownStyles.currencyDropdownComponent}>
             <TextInput placeholder='Search Country' value={inputFilter} onChangeText={(text) => setInputFilter(text)} style={currencyDropdownStyles.currencyDropdownInput} />
             <ScrollView>
-            <View style={currencyDropdownStyles.currencyDropdownInner}>
-                {
-                    countryList.filter((country)=>country.countryName.toLowerCase().includes(inputFilter.toLowerCase())).map((country) => {
+                <View style={currencyDropdownStyles.currencyDropdownInner}>
+                    {
+                        countryList.filter((country) => country.countryName.toLowerCase().includes(inputFilter.toLowerCase())).map((country) => {
 
-                        return (
+                            return (
 
-                            <Pressable key={country.countryIso} style={currencyDropdownStyles.currencyChip} onPress={()=>setSelectedCountry(country.countryIso)}>
-                                <Text style={currencyDropdownStyles.currencyChipPrimaryText}>{country.countryFlag} {country.countryName}</Text>
-                                <Text style={{fontSize:16, color: selectedCountry === country.countryIso ? preferColorPalette.light.primary: preferColorPalette.light.textSecondary}}>{getSymbolFromCurrency(country.currencyCode)?getSymbolFromCurrency(country.currencyCode):country.currencyCode}</Text>
-                            </Pressable>
-                        )
-                    })
-                }
-            </View>
+                                <Pressable key={country.countryIso} style={currencyDropdownStyles.currencyChip} onPress={() => selectCountry(country.countryIso)}>
+                                    <Text style={currencyDropdownStyles.currencyChipPrimaryText}>{country.countryFlag} {country.countryName}</Text>
+                                    <Text style={{ fontSize: 16, color: selectedCountry === country.countryIso ? preferColorPalette.light.primary : preferColorPalette.light.textSecondary }}>{getSymbolFromCurrency(country.currencyCode) ? getSymbolFromCurrency(country.currencyCode) : country.currencyCode}</Text>
+                                </Pressable>
+                            )
+                        })
+                    }
+                </View>
             </ScrollView>
         </View>
     )
@@ -57,20 +67,20 @@ const currencyDropdownStyles = StyleSheet.create({
 
     },
     currencyDropdownInner: {
-        marginTop:10,
-        display:'flex',
-        gap:5
+        marginTop: 10,
+        display: 'flex',
+        gap: 5
     },
-    currencyChip:{
-        padding:5,
-        display:'flex',
-        flexDirection:'row',
-        alignItems:'center',
-        justifyContent:'space-between'
+    currencyChip: {
+        padding: 5,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
-    currencyChipPrimaryText:{
-        fontSize:16,
-        fontWeight:'600',
-        color:preferColorPalette.light.textPrimary
+    currencyChipPrimaryText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: preferColorPalette.light.textPrimary
     }
 })

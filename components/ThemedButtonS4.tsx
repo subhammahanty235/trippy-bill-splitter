@@ -29,7 +29,7 @@ export function ThemedButtonS4({
     const color = useThemeColor({ light: lightBackgroundColor, dark: darkBackgroundColor }, "background")
     const textcolor = useThemeColor({ light: lightTextColor, dark: darkTextColor }, "text")
     return (
-        <Pressable style={[styles.button, {backgroundColor:'#ff' , borderColor:color, borderWidth:1.5} ]} onPress={onClick} {...rest}>
+        <Pressable style={[styles.button, {backgroundColor:'#fff' , borderColor:color, borderWidth:1.5} ]} onPress={onClick} {...rest}>
            
             <Text style={[styles.texts , {color:textcolor}]}>  <FontAwesome name={prefixIcon} color={preferColorPalette.light.tabIconSelected} size={18}/> {text}</Text>
             <FontAwesome5 name={icon} size={16} color={color}/>

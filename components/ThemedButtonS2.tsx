@@ -32,6 +32,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         elevation: 3,
         height:40,
+        backgroundColor: '#f2f2f2',
+        shadowColor: 'transparent',  // Neutral color
+    shadowOffset: { width: 0, height: 0 }, // No offset
+    shadowOpacity: 0, // No shadow opacity
+    shadowRadius: 0, // No shadow radius
         // backgroundColor:'black'
     },
     texts: {
