@@ -7,7 +7,7 @@ import { Stack } from 'expo-router';
 
 export default function ProfileStackScreen() {
   return (
-    <Stack initialRouteName='parofilePage'> 
+    <Stack initialRouteName='profilePage'> 
       <Stack.Screen name="profilePage" options={{ headerShown: false }}/>
       <Stack.Screen name="settingsPage" options={{ headerShown: false }}/>
       <Stack.Screen name="paymentOptionsPage" options={{ headerShown: false }}/>

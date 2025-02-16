@@ -31,7 +31,7 @@ export default function homepage() {
     // },
     {
       icon: 'coins',
-      headingT1: 'total',
+      headingT1: 'Current',
       headingT2: 'Expense',
       value: 7500,
       totalvalue: 150,
@@ -39,7 +39,7 @@ export default function homepage() {
     },
     {
       icon: 'wallet',
-      headingT1: 'my',
+      headingT1: 'My',
       headingT2: 'Expense',
       value: 300000,
       totalvalue: 60,
@@ -47,7 +47,7 @@ export default function homepage() {
     },
     {
       icon: 'hand-holding-usd',
-      headingT1: 'due',
+      headingT1: 'Due',
       headingT2: 'Money',
       value: 90,
       totalvalue: 180,
@@ -55,7 +55,7 @@ export default function homepage() {
     },
     {
       icon: 'wallet',
-      headingT1: 'myy',
+      headingT1: 'My',
       headingT2: 'Expense',
       value: 30,
       totalvalue: 60,
@@ -63,7 +63,7 @@ export default function homepage() {
     },
     {
       icon: 'hand-holding-usd',
-      headingT1: 'duee',
+      headingT1: 'Due',
       headingT2: 'Money',
       value: 80,
       totalvalue: 180,
@@ -182,7 +182,7 @@ function CurrentTripChip({ isVisible }: any) {
       </View>
       <View style={styles.tripId_details}>
         <Text style={{ color: 'grey' }}>Trip ID: #{liveTripOfUser?.tripUniqueCode}</Text>
-        <FontAwesome5 name={"copy"} color={"color"} />
+        <FontAwesome5 name={"copy"} color={"color"} /> 
       </View>
 
       <View style={styles.trip_members_box}>
@@ -191,7 +191,7 @@ function CurrentTripChip({ isVisible }: any) {
       </View>
       {
         isVisible ?
-          <ThemedButtonS1 lightBackgroundColor={preferColorPalette.light.tabIconSelected} text='Go to trip' onClick={() => { router.push('/(homepage)/liveTripDetails') }} />
+          <ThemedButtonS1 lightBackgroundColor={preferColorPalette.light.tabIconSelected} text='Go to trip' onClick={() => { router.push('/liveTripDetails') }} />
           :
           <></>
       }
@@ -223,10 +223,10 @@ function Cards({ dataObj }: { dataObj: CardDataObj }) {
   return (
     <View style={styles.card}>
       <View style={styles.cardTopSection}>
-        <Text style={styles.headingT1}>{dataObj.headingT1}</Text>
-        <FontAwesome5 name={dataObj.icon} size={20} color={preferColorPalette.light.primary} />
+        <Text style={styles.headingT1}>{dataObj.headingT1} {dataObj.headingT2}</Text>
+        {/* <FontAwesome5 name={dataObj.icon} size={20} color={preferColorPalette.light.primary} /> */}
       </View>
-      <Text style={styles.headingT2}>{dataObj.headingT2}</Text>
+      {/* <Text style={styles.headingT2}>{dataObj.headingT2}</Text> */}
 
       <View style={styles.values}>
         <Text style={styles.value}>{formatAmount(dataObj.value)}</Text>
@@ -282,8 +282,8 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "45%",
-    height: 180,
-    borderRadius: 20,
+    height: 140,
+    borderRadius: 10,
     backgroundColor: '#fff',
     display: 'flex',
     padding: '5%'
@@ -345,9 +345,9 @@ const styles = StyleSheet.create({
 
   },
   values: {
-    marginTop: '15%',
+    marginTop: '10%',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   trip_members_box: {
     marginTop: 15,
@@ -361,7 +361,8 @@ const styles = StyleSheet.create({
     fontSize: 17
   },
   value: {
-    fontSize: 40
+    fontSize: 25,
+    fontWeight:500
   },
   innerHomePage: {
     gap: 20,
@@ -379,12 +380,13 @@ const styles = StyleSheet.create({
   },
   headingT1: {
     fontSize: 16,
-    fontWeight: '300',
-    color: preferColorPalette.light.textSecondary
+    fontWeight: '400',
+    color: preferColorPalette.light.textPrimary
+    // color: preferColorPalette.light.textSecondary
   },
   headingT2: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '400',
     color: preferColorPalette.light.textPrimary
   },
 

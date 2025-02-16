@@ -3,7 +3,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
 const preferColorPalette = ColorsEmereldGreen;
 
 export default function HomeLayout() {
@@ -17,7 +16,7 @@ export default function HomeLayout() {
   
   return (
 
-    <Tabs initialRouteName='(auth)' screenOptions={{ headerShown: false }}>
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen name='(homepage)' options={{
         title: 'Home',
         tabBarActiveTintColor: preferColorPalette.light.navIconColor,
@@ -92,9 +91,10 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: 50,
+    height: '200%',
     borderRadius: 10,
     padding: 5,
+    width:100
   },
   focusedTab: {
     backgroundColor: '#ebf9f5',
@@ -114,19 +114,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '9%',
     borderRadius: 0,
-    // marginLeft: '5%',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     alignContent: 'center',
     justifyContent: 'center',
-    // marginBottom: '5%',
     shadowColor: '#000', // Shadow color
     shadowOffset: { width: 0, height: 2 }, // Shadow offset
     shadowOpacity: 0.1, // Shadow opacity
     shadowRadius: 8, // Shadow radius
     elevation: 5, // Elevation for Android shadow
-    paddingBottom: 15,
+    // paddingBottom: '5%',
     paddingLeft: 0,
     paddingRight: 0,
     opacity: 0.9

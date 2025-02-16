@@ -8,6 +8,7 @@ import { ThemedIconButton } from '@/components/ThemedIconButton'
 import { ThemedButtonS4 } from '@/components/ThemedButtonS4'
 import { ColorsEmereldGreen, getSelectedTheme, preloadTheme } from '@/constants/Colors'
 import { useAppSelector } from '@/hooks/reduxHook/hooks'
+import * as SecureStore from 'expo-secure-store';
 let preferColorPalette = getSelectedTheme();
 // const preferColorPalette = ColorsEmereldGreen;
 
@@ -18,6 +19,10 @@ export default function profile() {
     preloadTheme()
     preferColorPalette = getSelectedTheme()
   })
+
+  const signOutHandler = () => {
+    SecureStore.deleteItemAsync('authToken')
+  }
 
   return (
     <ThemedView style={styles.homepageContainer} lightColor={preferColorPalette.light.background} darkColor='#212529'>
@@ -31,11 +36,11 @@ export default function profile() {
 
         <View style={{marginTop:'15%' , display:'flex' , gap:15}}>
           <ThemedButtonS4 text='Edit Profile' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'pencil'} onClick={()=> router.push("/(home)/(profile)/updateProfilePage")}/>
-          <ThemedButtonS4 text='Payment Options' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'credit-card'} onClick={()=> router.push("/(profile)/paymentOptionsPage")}/>
+          <ThemedButtonS4 text='Payment Options' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'credit-card'} onClick={()=> router.push("/paymentOptionsPage")}/>
           <ThemedButtonS4 text='My Tours' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'bus'}/>
-          <ThemedButtonS4 text='Settings' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'cog'} onClick={()=> router.push("/(profile)/settingsPage")}/>
+          <ThemedButtonS4 text='Settings' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'cog'} onClick={()=> router.push("/settingsPage")}/>
           <ThemedButtonS4 text='Help' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'question'}/>
-          <ThemedButtonS4 text='Report Bug'  lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'bug'}/>
+          <ThemedButtonS4 text='Sign Out'  lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'sign-out'} onClick={signOutHandler}/>
         </View>
 
 
