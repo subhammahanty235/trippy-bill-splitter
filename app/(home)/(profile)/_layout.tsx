@@ -12,7 +12,7 @@ export default function ProfileStackScreen() {
       <Stack.Screen name="settingsPage" options={{ headerShown: false }}/>
       <Stack.Screen name="paymentOptionsPage" options={{ headerShown: false }}/>
       <Stack.Screen name="updateProfilePage" options={{headerShown:false}}/>
-
+      <Stack.Screen name="connectionsPage" options={{headerShown:false}}/>
     </Stack>
   );
 }

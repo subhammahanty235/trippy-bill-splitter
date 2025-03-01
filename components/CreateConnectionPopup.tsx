@@ -50,7 +50,7 @@ const AddConnectionComponent = ({removeBottomSheet}:any) => {
     useEffect(()=>{
         setEmailId("")
         removeBottomSheet();
-        dispatch(getAllConnections(1));
+        dispatch(getAllConnections());
     },[dispatch, connectionAdded])
 
     return (
@@ -105,11 +105,11 @@ const NoAccountExists = ({ emailId }: { emailId: string }) => {
     const {plUserCreated} = useAppSelector((state)=>state.connection)
 
     useEffect(()=>{
-        dispatch(getAllConnections(1));
+        dispatch(getAllConnections());
     },[dispatch, plUserCreated])
 
     const AddAndInvite = () => {
-        dispatch(addPLUserToConnection({ userId: 1, emailId: emailId.toLowerCase() }))
+        dispatch(addPLUserToConnection({emailId: emailId.toLowerCase() }))
     }
     return (
         <View style={createConnectionStyles.searchedProfile}>

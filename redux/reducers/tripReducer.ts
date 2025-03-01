@@ -9,7 +9,8 @@ interface AuthState {
     searchedTrip: any
     liveTripExpense: number
     loadingDetailsOfTrip: Boolean
-    completeTripDetails:any
+    completeTripDetails: any
+    liveTripMembers:any[]
 }
 
 
@@ -23,9 +24,9 @@ const initialState: AuthState = {
     tripFoundUsingCode: false,
     searchedTrip: null,
     liveTripExpense: 0,
-    loadingDetailsOfTrip:false,
-    completeTripDetails:null
-
+    loadingDetailsOfTrip: false,
+    completeTripDetails: null,
+    liveTripMembers:[]
 };
 
 const tripReducer = (state = initialState, action: any) => {
@@ -131,6 +132,7 @@ const tripReducer = (state = initialState, action: any) => {
                 ...state,
                 loadingDetailsOfTrip: false,
                 completeTripDetails: action.payload,
+                liveTripMembers:action.members
             };
         case 'FETCH_ALL_DETAILS_OF_TRIP_FAILURE':
             return {
@@ -138,6 +140,24 @@ const tripReducer = (state = initialState, action: any) => {
                 loadingDetailsOfTrip: false,
             }
 
+        case 'ADD_CONNECTION_TO_TRIP_REQUEST':
+            return {
+                ...state,
+                loadingAddToTrip: true,
+            }
+        case 'ADD_CONNECTION_TO_TRIP_SUCCESS':
+            return {
+                ...state,
+                loadingAddToTrip: false,
+                connectionAdded: true,
+            }
+        case 'ADD_CONNECTION_TO_TRIP_FAILURE':
+            return {
+                ...state,
+                loadingAddToTrip: false,
+                connectionAdded: false,
+                error: action.payload
+            }
         default:
             return state;
     }

@@ -38,6 +38,7 @@ export default function profile() {
           <ThemedButtonS4 text='Edit Profile' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'pencil'} onClick={()=> router.push("/(home)/(profile)/updateProfilePage")}/>
           <ThemedButtonS4 text='Payment Options' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'credit-card'} onClick={()=> router.push("/paymentOptionsPage")}/>
           <ThemedButtonS4 text='My Tours' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'bus'}/>
+          <ThemedButtonS4 text='Connections' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'bus'} onClick={()=> router.push("/connectionsPage")}/>
           <ThemedButtonS4 text='Settings' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'cog'} onClick={()=> router.push("/settingsPage")}/>
           <ThemedButtonS4 text='Help' lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'question'}/>
           <ThemedButtonS4 text='Sign Out'  lightBackgroundColor='gray' icon={'angle-right'} lightTextColor={preferColorPalette.light.textPrimary} prefixIcon={'sign-out'} onClick={signOutHandler}/>

@@ -138,6 +138,7 @@ export const addUserToConnection = (data: any) => async (dispatch: Dispatch) => 
         if (!response.status) {
             throw new Error("Failed to search user")
         }
+        console.log("------------------------->")
         console.log(response.data)
         if (response.data.success === true) {
             dispatch(addUserToConnectionSuccess())
@@ -150,7 +151,8 @@ export const addUserToConnection = (data: any) => async (dispatch: Dispatch) => 
     }
 }
 
-export const getAllConnections = (userId:number) => async(dispatch:Dispatch) => {
+export const getAllConnections = () => async(dispatch:Dispatch) => {
+    console.log("Getting all connection of the user........................")
     dispatch(getAllConnectionsRequest())
     const token = await SecureStore.getItemAsync("authToken")
     try {
@@ -178,12 +180,13 @@ export const getAllConnections = (userId:number) => async(dispatch:Dispatch) => 
 // as a connection, in this scenario we basically create a account with the given emailId and whenever they will create
 // a account, all the data (trips, connections) will be automatically synced to their new account. 
 export const addPLUserToConnection = (data: any) => async (dispatch: Dispatch) => {
+    console.log("Creating plc user and adding")
+    // const appdispatch = useAppDispatch()
     dispatch(addPLUserToConnectionRequest());
     const token = await SecureStore.getItemAsync("authToken")
     try {
         const response = await axios.post(`http://localhost:5050/api/v1/connection/pluser/addConnection`,
             {
-                userId: data.userId,
                 emailId: data.emailId
             },
             {
@@ -201,6 +204,7 @@ export const addPLUserToConnection = (data: any) => async (dispatch: Dispatch) =
         if (response.data.success === true) {
             dispatch(removeStateTempValues())
             dispatch(addPLUserToConnectionSuccess())
+            // appdispatch(getAllConnections())
         } else {
             dispatch(addPLUserToConnectionReject(response.data.message))
         }
@@ -209,3 +213,5 @@ export const addPLUserToConnection = (data: any) => async (dispatch: Dispatch) =
         console.log(error)
     }
 }
+
+

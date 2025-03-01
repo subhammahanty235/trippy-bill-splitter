@@ -143,8 +143,8 @@ export default function homepage() {
           onScrollEndDrag={handleScroll}
           onScrollBeginDrag={handleScroll}
         >
-          {cardDataArray?.map((cardObj: CardDataObj) => (
-            <Cards key={cardObj.headingT1} dataObj={cardObj} />
+          {cardDataArray?.map((cardObj: CardDataObj , index:number) => (
+            <Cards key={index} dataObj={cardObj} />
           ))}
         </Animated.ScrollView>
       </SafeAreaView>

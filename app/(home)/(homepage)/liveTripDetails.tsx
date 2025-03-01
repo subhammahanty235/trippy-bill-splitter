@@ -1,5 +1,5 @@
 import { Animated, Pressable, StyleSheet, Text, View, ScrollView, Image } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ColorsEmereldGreen } from '@/constants/Colors'
 import { useRouter } from 'expo-router';
@@ -13,6 +13,9 @@ import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook/hooks';
 import { useDispatch } from 'react-redux';
 import { fetchTripDetails, getLiveTripExpense } from '@/redux/actions/tripAction';
 import { fetchAllLendingsOfUserTripBased } from '@/redux/actions/expenseAction';
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { BottomSheetParentComponent } from '@/components/BottomSheetParentComponent';
+import SelectConnection from '@/components/SelectConection';
 const preferColorPalette = ColorsEmereldGreen;
 
 
@@ -25,19 +28,33 @@ const liveTripDetails = () => {
     }, [liveTripOfUser, liveTripOfUser])
 
 
+    //BottomSheet --> TODO: Change the complete architectite to make the code organized
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    const [selectedBottomSheet, setSelectedBottomSheet] = useState();
+    // const [formControllers, setFormControllers] = useState({});
+    const handlePresentModalPress = useCallback((component: any) => {
+  
+      setSelectedBottomSheet(component)
+      bottomSheetModalRef.current?.present();
+    }, []);
+
+
     return (
         <ThemedView style={styles.liveTripContainer} lightColor={preferColorPalette.light.background} darkColor='#212529'>
+            <BottomSheetModalProvider>
             <View style={extraStyles.halfCircle} />
             <SafeAreaView >
-                <LiveTripHeading />
+                <LiveTripHeading/>
                 <ScrollView showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}>
                     <View style={{ flex: 1, height: "100%" }}>
-                        <LiveTripDetails />
+                        <LiveTripDetails handlePresentModalPress={handlePresentModalPress}/>
                         <MoreStatisticsCards />
+                        <BottomSheetParentComponent bottomSheetModalRef={bottomSheetModalRef} component={selectedBottomSheet} />
                     </View>
                 </ScrollView>
             </SafeAreaView>
+            </BottomSheetModalProvider>
         </ThemedView>
     )
 }
@@ -60,7 +77,7 @@ function LiveTripHeading() {
     )
 }
 
-function LiveTripDetails() {
+function LiveTripDetails({handlePresentModalPress}:any) {
     const router = useRouter()
     const dispatch = useAppDispatch();
     const { liveTripExpense, liveTripOfUser, completeTripDetails, loadingDetailsOfTrip } = useAppSelector((state) => state.trip)
@@ -75,6 +92,7 @@ function LiveTripDetails() {
                 <Text style={{ color: preferColorPalette.light.textPrimary, fontSize: 30, fontWeight: '600', marginBottom: 15 }}>${liveTripExpense}</Text>
                 <ThemedButtonS1 lightBackgroundColor={preferColorPalette.light.primary} text='List Expense' onClick={() => router.push('/listExpense')} />
             </View>
+            <ThemedButtonS1 text='Add People' lightBackgroundColor='pink' onClick={()=>{handlePresentModalPress(<SelectConnection/>)}}/>
             <Text style={{ color: 'grey', marginTop: 5 }}>{completeTripDetails?.tripDescription}</Text>
             <View style={liveTripDetailsStyle.startdateAndenddate}>
                 <View style={liveTripDetailsStyle.startdateAndendDateChip}>
@@ -129,14 +147,20 @@ const MoreStatisticsCards = ({ data, left }: any) => {
 }
 
 const TripMembersList = () => {
-    const { liveTripOfUser, loadingFetchliveTrip } = useAppSelector((state) => state.trip)
-    const members = liveTripOfUser?.tripUsers
+    const { liveTripOfUser, loadingFetchliveTrip, completeTripDetails, liveTripMembers } = useAppSelector((state) => state.trip)
+    const members = completeTripDetails?.tripUsersArray;
+    useEffect(()=>{
+        console.log("here i am m............>")
+        console.log(liveTripMembers)
+    },[])
     return (
         <View style={tripMembersListStyles.tripMemberListComp}>
             {
-                members?.map((member: any) => {
+                liveTripMembers?.map((member: any, index:number) => {
+                    console.log(member)
+                    console.log(completeTripDetails)
                     return (
-                        <View style={tripMembersListStyles.tripMemberListCompChip}>
+                        <View style={tripMembersListStyles.tripMemberListCompChip} key={index}>
                             <Image style={tripMembersListStyles?.tripMemberProfilePic} height={50} width={50} source={{ uri: member?.people?.profilePic }} />
                             <View style={{}}>
                                 <Text style={{ fontSize: 18, fontWeight: '600', }}>{member?.people?.name}</Text>

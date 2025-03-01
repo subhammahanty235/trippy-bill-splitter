@@ -28,7 +28,7 @@ export default function newTrip() {
   }, []);
 
   useEffect(() => {
-    dispatch(getAllConnections(1))
+    dispatch(getAllConnections())
   }, [dispatch])
 
 

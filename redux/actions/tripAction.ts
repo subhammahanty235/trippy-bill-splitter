@@ -2,6 +2,7 @@ import filterFormControllersForBackend from '@/helpers/filterControllers';
 import axios from 'axios';
 import { Dispatch } from 'redux';
 import * as SecureStore from 'expo-secure-store';
+import { store } from '../store';
 
 export const ADD_CONNECTION_TO_LIST = 'Add_CONNECTION_TO_LIST';
 export const REMOVE_CONNECTION_FROM_LIST = 'REMOVE_CONNECTION_FROM_LIST';
@@ -27,6 +28,9 @@ export const FETCH_ALL_DETAILS_OF_TRIP_REQUEST = 'FETCH_ALL_DETAILS_OF_TRIP_REQU
 export const FETCH_ALL_DETAILS_OF_TRIP_SUCCESS = 'FETCH_ALL_DETAILS_OF_TRIP_SUCCESS';
 export const FETCH_ALL_DETAILS_OF_TRIP_FAILURE = 'FETCH_ALL_DETAILS_OF_TRIP_FAILURE';
 
+export const ADD_CONNECTION_TO_TRIP_REQUEST = 'ADD_CONNECTION_TO_TRIP_REQUEST';
+export const ADD_CONNECTION_TO_TRIP_SUCCESS = 'ADD_CONNECTION_TO_TRIP_SUCCESS';
+export const ADD_CONNECTION_TO_TRIP_FAILURE = 'ADD_CONNECTION_TO_TRIP_FAILURE';
 
 
 
@@ -63,7 +67,8 @@ export const searchTripUsingTripCode = () => ({
 
 export const searchTripUsingTripCodeSuccess = (tripData: any) => ({
     type: SEARCH_TRIP_USING_TRIPCODE_SUCCESS,
-    payload: tripData,
+    payload: tripData.trip,
+    members:tripData?.tripUsersArray
 });
 
 export const searchTripUsingTripCodeNotFound = () => ({
@@ -97,11 +102,26 @@ export const fetchAllDetailsOfTripRequest = () => ({
 
 export const fetchAllDetailsOfTripSuccess = (data:any) => ({
     type: FETCH_ALL_DETAILS_OF_TRIP_SUCCESS,
-    payload: data,
+    payload: data.trip,
+    members:data.tripUsersArray
 });
 
 export const fetchAllDetailsOfTripFailure = (error:string) => ({
     type: FETCH_ALL_DETAILS_OF_TRIP_FAILURE,
+    payload: error,
+});
+
+// Add Connection to Trip
+export const addConnectionToTripRequest = () => ({
+    type: ADD_CONNECTION_TO_TRIP_REQUEST,
+});
+
+export const addConnectionToTripSuccess = () => ({
+    type: ADD_CONNECTION_TO_TRIP_SUCCESS,
+});
+
+export const addConnectionToTripFailure = (error:string) => ({
+    type: ADD_CONNECTION_TO_TRIP_FAILURE,
     payload: error,
 });
 
@@ -121,6 +141,7 @@ export const fetchAllDetailsOfTripFailure = (error:string) => ({
 export const fetchLiveTripOfUser = () => async (dispatch: Dispatch) => {
     dispatch(fetchLiveTripOfUserRequest());
     const token = await SecureStore.getItemAsync("authToken")
+    console.log(token)
     try {
         //TODO
         const response = await axios.get(`http://localhost:5050/api/v1/trip/livetrip/user`,
@@ -135,6 +156,7 @@ export const fetchLiveTripOfUser = () => async (dispatch: Dispatch) => {
         if (!response.status) {
             throw new Error("Failed to search user")
         } 
+        
         console.log(response.data)
         if (response.data.success === true) {
             dispatch(fetchLiveTripOfUserSuccess(response.data.trip))
@@ -178,6 +200,7 @@ export const createNewTrip = (data: any) => async (dispatch: Dispatch) => {
 
 
 export const searchTripUsingCode = (tripCode: any) => async (dispatch: Dispatch) => {
+    console.log("Heyyy-------------------------------------------------------------------------->")
     dispatch(searchTripUsingTripCode());
     const token = await SecureStore.getItemAsync("authToken")
     try {
@@ -193,13 +216,17 @@ export const searchTripUsingCode = (tripCode: any) => async (dispatch: Dispatch)
             },
 
         )
+        console.log("<--------------- response from the trip and user api ------------------->")
+        console.log(response.data)
         if(response.data.success === true){
-            console.log("here found the trip")
-            dispatch(searchTripUsingTripCodeSuccess(response.data.trip))
+            console.log("here found the trip......")
+
+            dispatch(searchTripUsingTripCodeSuccess(response.data))
         }
 
         console.log(response.status)
     } catch (error:any) {
+        console.log(error)
         if (error.response?.status === 404) {
             dispatch(searchTripUsingTripCodeNotFound())
         }else{
@@ -227,7 +254,9 @@ export const fetchTripDetails = (tripCode: any) => async (dispatch: Dispatch) =>
         )
         if(response.data.success === true){
             console.log("here found the trip")
-            dispatch(fetchAllDetailsOfTripSuccess(response.data.trip))
+            
+            console.log(response.data)
+            dispatch(fetchAllDetailsOfTripSuccess(response.data))
         }
 
         console.log(response.status)
@@ -254,13 +283,49 @@ export const getLiveTripExpense = (tripId:number) => async (dispatch: Dispatch) 
         )
 
         if(response.data.success === true){
-            console.log("here found the trip")
             dispatch(fetchLiveTripExpenseOfUserSuccess(response.data.amount))
         }
     } catch (error:any) {
         dispatch(fetchLiveTripExpenseOfUserFailure(error.message));
     }
 }
+
+export const addConnectionToTrip = (data: any) => async (dispatch: Dispatch) => {
+    console.log("Adding user to connection")
+    dispatch(addConnectionToTripRequest());
+    const {completeTripDetails} = store.getState().trip
+    const token = await SecureStore.getItemAsync("authToken")
+    console.log("Complete trip details ....................")
+    console.log(completeTripDetails.id)
+    try {
+        const response = await axios.post(`http://localhost:5050/api/v1/trip/add/user/${completeTripDetails.id}`,
+            {
+                connectionId:data
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization:token
+                },
+            }
+        )
+
+        if (!response.status) {
+            throw new Error("Failed to add connection")
+        }
+        console.log("------------------------->")
+        console.log(response.data)
+        if (response.data.success === true) {
+            dispatch(addConnectionToTripSuccess())
+        } else {
+            dispatch(addConnectionToTripFailure(response.data.message))
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 export const addConnectionToList = (connection: any) => (dispatch: Dispatch) => {
     console.log(connection)
